@@ -1,10 +1,9 @@
 // import logo from './logo.svg';
-// import './App.css';
+
 
 function App() {
   return (
-    <div className="root">
-      <div className="page">
+    <div className="page">
         <header className="header">
           <img className="logo" src="<%=require('./images/logo.svg')%>" alt="Логотип Место"/>
         </header>
@@ -28,7 +27,6 @@ function App() {
         <footer className="footer">
           <p className="footer__copyright">2023 Mesto Russia</p>
         </footer>
-      </div>
       <section className="popup popup_type_confirm-delete" aria-label="Модальное окно удаления картинки">
         <div className="popup__container">
           <p className="popup__title">Вы уверены?</p>
@@ -95,7 +93,7 @@ function App() {
           </div>
         </div>
       </template>
-    </div>
+  </div>
   );
 }
 
