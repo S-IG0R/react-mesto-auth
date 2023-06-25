@@ -10,6 +10,12 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
 
+  const closeAllPopups = () => {
+    setIsEditAvatarPopupOpen(false);
+    setIsEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+  }
+
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
   }
@@ -29,17 +35,17 @@ function App() {
         onEditAvatar={handleEditAvatarClick}/>
       <Footer />
 
-      <PopupWithForm name="confirm-delete" title="Вы уверены?">
+      <PopupWithForm name="confirm-delete" title="Вы уверены?" onClose={closeAllPopups}>
           <button className="popup__submit-btn popup__submit-btn_type_confirm-delete" type="submit">Да</button>
       </PopupWithForm>
 
-      <PopupWithForm name="edit-avatar" title="Обновить аватар" isOpen={isEditAvatarPopupOpen}>
+      <PopupWithForm name="edit-avatar" title="Обновить аватар" isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups}>
          <input className="popup__input popup__input_el_pic-url" name="avatar" id="input-avatar-url" type="url" placeholder="Ссылка на аватарку" required />
          <span className="input-avatar-url-error popup__input-error"></span>
          <button className="popup__submit-btn popup__submit-btn_type_avatar-change" type="submit">Сохранить</button>
       </PopupWithForm>
 
-      <PopupWithForm name="edit-profile" title="Редактировать профиль" isOpen={isEditProfilePopupOpen}>
+      <PopupWithForm name="edit-profile" title="Редактировать профиль" isOpen={isEditProfilePopupOpen} onClose={closeAllPopups}>
           <input className="popup__input popup__input_el_name" name="name" id="input-name" type="text" placeholder="Имя" minLength="2" maxLength="40" required />
           <span className="input-name-error popup__input-error"></span>
           <input className="popup__input popup__input_el_job" name="job" id="input-job" type="text" placeholder="Род деятельности" minLength="2" maxLength="200" required />
@@ -47,7 +53,7 @@ function App() {
           <button className="popup__submit-btn popup__submit-btn_type_edit-bio" type="submit">Сохранить</button>
       </PopupWithForm>
 
-      <PopupWithForm name="add-pic" title="Новое место" isOpen={isAddPlacePopupOpen}>
+      <PopupWithForm name="add-pic" title="Новое место" isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}>
           <input className="popup__input popup__input_el_pic-name" name="name" id="input-pic-name" type="text" placeholder="Название" minLength="2" maxLength="30" required />
           <span className="input-pic-name-error popup__input-error"></span>
           <input className="popup__input popup__input_el_pic-url" name="link" id="input-pic-url" type="url" placeholder="Ссылка на картинку" required />
