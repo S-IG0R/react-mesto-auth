@@ -3,19 +3,36 @@ import { Header } from './Header';
 import { Main } from './Main';
 import { Footer } from './Footer';
 import { PopupWithForm } from './PopupWithForm';
+import { api } from '../utils/Api';
 
 function App() {
 
+  // Состояние попапов
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
+  // Состояние данных пользователя
+  const [userName, setUserName] = React.useState('');
+  const [userDescription, setUserDescription] = React.useState('');
+  const [userAvatar, setUserAvatar] = React.useState('');
+  // Забираем данные пользователя
+  React.useEffect(() => {
+    api.getUserInfo()
+      .then((userData) => {
+        setUserName(userData.name);
+        setUserDescription(userData.about);
+        setUserAvatar(userData.avatar);
+       })
+      .catch((err) => console.log(err))
+  }, [])
 
+  // Обработчик закрытия крестиком
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
   }
-
+  // Обработчики открытия попапов
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
   }
@@ -32,7 +49,11 @@ function App() {
       <Main 
         onEditProfile={handleEditProfileClick} 
         onAddPlace={handleAddPlaceClick} 
-        onEditAvatar={handleEditAvatarClick}/>
+        onEditAvatar={handleEditAvatarClick}
+        userAvatar={userAvatar}
+        userName={userName}
+        userDescription={userDescription}
+      />
       <Footer />
 
       <PopupWithForm name="confirm-delete" title="Вы уверены?" onClose={closeAllPopups}>
