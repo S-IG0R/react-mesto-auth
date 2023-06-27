@@ -1,6 +1,6 @@
 export function Card({ card, onCardClick }) {
   function handleClick() {
-    onCardClick(card);
+    onCardClick(card.link);
   }
   return (
     <div className="cards__item">

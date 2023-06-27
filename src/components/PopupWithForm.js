@@ -1,4 +1,11 @@
-export function PopupWithForm({ name, title, children, isOpen, onClose }) {
+export function PopupWithForm({
+  name,
+  title,
+  children,
+  isOpen,
+  onClose,
+  buttonText,
+}) {
   return (
     <section className={`popup popup_type_${name} ${isOpen && `popup_opened`}`}>
       <div className="popup__container">
@@ -14,6 +21,9 @@ export function PopupWithForm({ name, title, children, isOpen, onClose }) {
           noValidate
         >
           {children}
+          <button className="popup__submit-btn" type="submit">
+            {buttonText}
+          </button>
         </form>
       </div>
     </section>

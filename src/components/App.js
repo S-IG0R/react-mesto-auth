@@ -15,15 +15,15 @@ function App() {
     React.useState(false);
 
   // Состояние данных пользователя
-  const [userName, setUserName] = React.useState([]);
-  const [userDescription, setUserDescription] = React.useState([]);
-  const [userAvatar, setUserAvatar] = React.useState([]);
+  const [userName, setUserName] = React.useState('');
+  const [userDescription, setUserDescription] = React.useState('');
+  const [userAvatar, setUserAvatar] = React.useState('');
 
   // Состояние данных карточек
   const [cards, setCards] = React.useState([]);
 
   // Состояние попапа с картинкой
-  const [selectedCard, setSelectedCard] = React.useState('');
+  const [selectedCard, setSelectedCard] = React.useState(null);
 
   // Забираем данные карточек
   React.useEffect(() => {
@@ -52,7 +52,7 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
-    setSelectedCard(false);
+    setSelectedCard(null);
   };
 
   // Обработчики открытия попапов
@@ -87,19 +87,14 @@ function App() {
         name="confirm-delete"
         title="Вы уверены?"
         onClose={closeAllPopups}
-      >
-        <button
-          className="popup__submit-btn popup__submit-btn_type_confirm-delete"
-          type="submit"
-        >
-          Да
-        </button>
-      </PopupWithForm>
+        buttonText="Да"
+      />
       <PopupWithForm
         name="edit-avatar"
         title="Обновить аватар"
         isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
+        buttonText="Сохранить"
       >
         <input
           className="popup__input popup__input_el_pic-url"
@@ -110,18 +105,13 @@ function App() {
           required
         />
         <span className="input-avatar-url-error popup__input-error"></span>
-        <button
-          className="popup__submit-btn popup__submit-btn_type_avatar-change"
-          type="submit"
-        >
-          Сохранить
-        </button>
       </PopupWithForm>
       <PopupWithForm
         name="edit-profile"
         title="Редактировать профиль"
         isOpen={isEditProfilePopupOpen}
         onClose={closeAllPopups}
+        buttonText="Сохранить"
       >
         <input
           className="popup__input popup__input_el_name"
@@ -145,18 +135,13 @@ function App() {
           required
         />
         <span className="input-job-error popup__input-error"></span>
-        <button
-          className="popup__submit-btn popup__submit-btn_type_edit-bio"
-          type="submit"
-        >
-          Сохранить
-        </button>
       </PopupWithForm>
       <PopupWithForm
         name="add-pic"
         title="Новое место"
         isOpen={isAddPlacePopupOpen}
         onClose={closeAllPopups}
+        buttonText="Создать"
       >
         <input
           className="popup__input popup__input_el_pic-name"
@@ -178,12 +163,6 @@ function App() {
           required
         />
         <span className="input-pic-url-error popup__input-error"></span>
-        <button
-          className="popup__submit-btn popup__submit-btn_type_new-photo"
-          type="submit"
-        >
-          Создать
-        </button>
       </PopupWithForm>
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
     </div>
