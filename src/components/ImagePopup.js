@@ -5,8 +5,8 @@ export function ImagePopup({ card, onClose }) {
       aria-label="Модальное окно просмотра фото"
     >
       <div className="popup__container popup__container_type_zoom-photo">
-        <img className="popup__image" src={card} alt="#" />
-        <p className="popup__picture-caption"></p>
+      <img className="popup__image" src={card?.link} alt={card?.name} />
+        <p className="popup__picture-caption">{card?.name}</p>
         <button
           className="popup__close-btn"
           type="button"

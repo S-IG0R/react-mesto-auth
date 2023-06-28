@@ -65,8 +65,8 @@ function App() {
   const handleAddPlaceClick = () => {
     setIsAddPlacePopupOpen(true);
   };
-  const handleCardClick = (card) => {
-    setSelectedCard(card);
+  const handleCardClick = (link) => {
+    setSelectedCard(link);
   };
 
   return (
