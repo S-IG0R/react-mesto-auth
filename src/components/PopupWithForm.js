@@ -6,8 +6,16 @@ export function PopupWithForm({
   onClose,
   buttonText,
 }) {
+  const handleClickToOverlay = (evt) => {
+    if (evt.target === evt.currentTarget) {
+      onClose();
+    }
+  };
   return (
-    <section className={`popup popup_type_${name} ${isOpen && `popup_opened`}`}>
+    <section
+      className={`popup popup_type_${name} ${isOpen && `popup_opened`}`}
+      onClick={handleClickToOverlay}
+    >
       <div className="popup__container">
         <p className="popup__title">{title}</p>
         <button

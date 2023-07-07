@@ -1,3 +1,6 @@
+import React from 'react';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import { CardsContext } from '../contexts/CardsContext';
 import { Card } from './Card';
 
 export function Main({
@@ -5,21 +8,26 @@ export function Main({
   onAddPlace,
   onEditAvatar,
   onCardClick,
-  userAvatar,
-  userName,
-  userDescription,
-  cards,
+  onCardLike,
+  onCardDelete,
 }) {
+  //Передаем в хук контекст. с полученными данными с сервера и подставляем данные куда нужно
+  const currentUser = React.useContext(CurrentUserContext);
+  const cards = React.useContext(CardsContext);
   return (
     <main className="content">
       <section className="profile">
         <div className="profile__common-container">
           <button className="profile__avatar-edit-btn" onClick={onEditAvatar}>
-            <img src={userAvatar} alt="аватарка" className="profile__avatar" />
+            <img
+              src={currentUser?.avatar}
+              alt="аватарка"
+              className="profile__avatar"
+            />
           </button>
           <div className="profile__text-container">
-            <h1 className="profile__hero-name">{userName}</h1>
-            <p className="profile__hero-job">{userDescription}</p>
+            <h1 className="profile__hero-name">{currentUser?.name}</h1>
+            <p className="profile__hero-job">{currentUser?.about}</p>
           </div>
           <button
             className="profile__edit-button"
@@ -35,7 +43,15 @@ export function Main({
       </section>
       <section className="cards" aria-label="Фотогалерея">
         {cards.map((card) => {
-          return <Card card={card} key={card._id} onCardClick={onCardClick} />;
+          return (
+            <Card
+              key={card._id}
+              card={card}
+              onCardClick={onCardClick}
+              onCardLike={onCardLike}
+              onCardDelete={onCardDelete}
+            />
+          );
         })}
       </section>
     </main>
