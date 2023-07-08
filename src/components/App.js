@@ -7,6 +7,7 @@ import { ImagePopup } from './ImagePopup';
 import { api } from '../utils/Api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { CardsContext } from '../contexts/CardsContext';
+import { EditProfilePopup } from './EditProfilePopup';
 
 function App() {
   const [currentUser, setCurrentUser] = React.useState(null);
@@ -107,8 +108,8 @@ function App() {
       ? api
           .deleteLike(card._id)
           .then((newCardData) => {
-            setCards((state) => {
-              return state.map((cardInState) => {
+            setCards((stateCards) => {
+              return stateCards.map((cardInState) => {
                 return cardInState._id === card._id ? newCardData : cardInState;
               });
             });
@@ -117,8 +118,8 @@ function App() {
       : api
           .putLike(card._id)
           .then((newCardData) => {
-            setCards((state) => {
-              return state.map((cardInState) => {
+            setCards((stateCards) => {
+              return stateCards.map((cardInState) => {
                 return cardInState._id === card._id ? newCardData : cardInState;
               });
             });
@@ -126,18 +127,30 @@ function App() {
           .catch((err) => console.log(err));
   };
 
+  //обработка удаления карточки
   const handleCardDelete = (card) => {
     api
       .deleteCard(card._id)
       .then(() => {
         setCards((state) => {
           return state.filter((cardInState) => {
-            return cardInState._id !== card._id
-          })
-        })
+            return cardInState._id !== card._id;
+          });
+        });
       })
       .catch((err) => console.log(err));
   };
+
+  //обработка обновления данных юзера после сабмита
+  const handleUpdateUser = ({name, about}) => {
+    api
+    .setProfileData({ name, about })
+    .then((userData) => {
+      setCurrentUser(userData);
+      closeAllPopups();
+    })
+    .catch((err) => console.log(err))
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -177,36 +190,11 @@ function App() {
           />
           <span className="input-avatar-url-error popup__input-error"></span>
         </PopupWithForm>
-        <PopupWithForm
-          name="edit-profile"
-          title="Редактировать профиль"
+        <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
           onClose={closeAllPopups}
-          buttonText="Сохранить"
-        >
-          <input
-            className="popup__input popup__input_el_name"
-            name="name"
-            id="input-name"
-            type="text"
-            placeholder="Имя"
-            minLength="2"
-            maxLength="40"
-            required
-          />
-          <span className="input-name-error popup__input-error"></span>
-          <input
-            className="popup__input popup__input_el_job"
-            name="job"
-            id="input-job"
-            type="text"
-            placeholder="Род деятельности"
-            minLength="2"
-            maxLength="200"
-            required
-          />
-          <span className="input-job-error popup__input-error"></span>
-        </PopupWithForm>
+          onUpdateUser={handleUpdateUser}
+        />
         <PopupWithForm
           name="add-pic"
           title="Новое место"

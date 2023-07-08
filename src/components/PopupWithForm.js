@@ -5,6 +5,7 @@ export function PopupWithForm({
   isOpen,
   onClose,
   buttonText,
+  onSubmit
 }) {
   const handleClickToOverlay = (evt) => {
     if (evt.target === evt.currentTarget) {
@@ -26,6 +27,7 @@ export function PopupWithForm({
         <form
           className={`popup__form popup__form_type_${name}`}
           name="popup-form"
+          onSubmit={onSubmit}
           noValidate
         >
           {children}
