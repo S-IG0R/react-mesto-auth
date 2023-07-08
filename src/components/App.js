@@ -8,6 +8,7 @@ import { api } from '../utils/Api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { CardsContext } from '../contexts/CardsContext';
 import { EditProfilePopup } from './EditProfilePopup';
+import { EditAvatarPopup } from './EditAvatarPopup';
 
 function App() {
   const [currentUser, setCurrentUser] = React.useState(null);
@@ -142,15 +143,15 @@ function App() {
   };
 
   //обработка обновления данных юзера после сабмита
-  const handleUpdateUser = ({name, about}) => {
+  const handleUpdateUser = ({ name, about }) => {
     api
-    .setProfileData({ name, about })
-    .then((userData) => {
-      setCurrentUser(userData);
-      closeAllPopups();
-    })
-    .catch((err) => console.log(err))
-  }
+      .setProfileData({ name, about })
+      .then((userData) => {
+        setCurrentUser(userData);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -173,23 +174,10 @@ function App() {
           onClose={closeAllPopups}
           buttonText="Да"
         />
-        <PopupWithForm
-          name="edit-avatar"
-          title="Обновить аватар"
+        <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
-          buttonText="Сохранить"
-        >
-          <input
-            className="popup__input popup__input_el_pic-url"
-            name="avatar"
-            id="input-avatar-url"
-            type="url"
-            placeholder="Ссылка на аватарку"
-            required
-          />
-          <span className="input-avatar-url-error popup__input-error"></span>
-        </PopupWithForm>
+        />
         <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
           onClose={closeAllPopups}
