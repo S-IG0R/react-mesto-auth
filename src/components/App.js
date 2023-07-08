@@ -146,8 +146,19 @@ function App() {
   const handleUpdateUser = ({ name, about }) => {
     api
       .setProfileData({ name, about })
-      .then((userData) => {
-        setCurrentUser(userData);
+      .then((newUserData) => {
+        setCurrentUser(newUserData);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err));
+  };
+
+  //обработка обновления аватара после сабмита
+  const handleUpdateAvatar = (avatar) => {
+    api
+      .setUserAvatar(avatar)
+      .then((newUserData) => {
+        setCurrentUser(newUserData)
         closeAllPopups();
       })
       .catch((err) => console.log(err));
@@ -177,6 +188,7 @@ function App() {
         <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
+          onUpdateAvatar={handleUpdateAvatar}
         />
         <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
