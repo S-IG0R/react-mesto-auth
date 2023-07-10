@@ -6,11 +6,17 @@ import { PopupWithForm } from './PopupWithForm';
 import { ImagePopup } from './ImagePopup';
 import { api } from '../utils/Api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { CardsContext } from '../contexts/CardsContext';
 import { EditProfilePopup } from './EditProfilePopup';
 import { EditAvatarPopup } from './EditAvatarPopup';
+import { AddPlacePopup } from './AddPlacePopup';
+import { Notification } from './Notification';
 
 function App() {
+  // Состояние всплывающего уведомления
+  const [notification, setNotification] = React.useState(null);
+  // Состояние процесса загрузки на сервер
+  const [showLoading, setShowLoading] = React.useState('');
+  // Состояние пользовательских данных
   const [currentUser, setCurrentUser] = React.useState(null);
   // Состояние попапов
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
@@ -18,10 +24,8 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
     React.useState(false);
-
   // Состояние данных карточек
   const [cards, setCards] = React.useState([]);
-
   // Состояние попапа с картинкой
   const [selectedCard, setSelectedCard] = React.useState(null);
 
@@ -60,7 +64,7 @@ function App() {
     selectedCard,
   ]);
 
-  // Закрытие попапа по Esc - если true вешаем попап
+  // Закрытие попапа по Esc
   React.useEffect(() => {
     if (isAnyPopupOpen) {
       const handleEsc = (evt) => {
@@ -98,6 +102,14 @@ function App() {
     setSelectedCard(link);
   };
 
+  const showNotification = (message, isSuccess, isActive) => {
+    setNotification({ message, isSuccess, isActive });
+    setTimeout(
+      () => setNotification({ message, isSuccess, isActive: false }),
+      2000
+    );
+  };
+
   //обработка лайка
   const handleCardLike = (card, myId) => {
     //проверяем есть ли лайк
@@ -128,7 +140,7 @@ function App() {
           .catch((err) => console.log(err));
   };
 
-  //обработка удаления карточки
+  //обработка передачи данных на сервер удаления карточки
   const handleCardDelete = (card) => {
     api
       .deleteCard(card._id)
@@ -138,46 +150,80 @@ function App() {
             return cardInState._id !== card._id;
           });
         });
+        showNotification('Карточка удалена', true, true);
       })
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        showNotification(`Карточка не удалена, ${err}`, false, true)
+      );
   };
 
-  //обработка обновления данных юзера после сабмита
+  //обработка передачи на сервер обновлению данных пользователя
   const handleUpdateUser = ({ name, about }) => {
+    setShowLoading('...');
     api
       .setProfileData({ name, about })
       .then((newUserData) => {
         setCurrentUser(newUserData);
-        closeAllPopups();
+        showNotification('Данные пользователя обновлены', true, true);
       })
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        showNotification(`Данные не обновлены, ${err}`, false, true)
+      )
+      .finally(() => {
+        setShowLoading('');
+        closeAllPopups();
+      });
   };
 
-  //обработка обновления аватара после сабмита
+  //обработка передачи данных на сервер нового аватара
   const handleUpdateAvatar = (avatar) => {
+    setShowLoading('...');
     api
       .setUserAvatar(avatar)
       .then((newUserData) => {
-        setCurrentUser(newUserData)
-        closeAllPopups();
+        setCurrentUser(newUserData);
+        showNotification('Аватар обновлен', true, true);
       })
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        showNotification(`Аватар не обновлен, ${err}`, false, true)
+      )
+      .finally(() => {
+        setShowLoading('');
+        closeAllPopups();
+      });
+  };
+
+  //обработка передачи данных на сервер добавления новый карточки
+  const handleAddPlaceSubmit = (inputValues) => {
+    setShowLoading('...');
+    api
+      .addNewCard(inputValues)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        showNotification('Новая карточка добавлена', true, true);
+      })
+      .catch((err) =>
+        showNotification(`Новая карточка не добавлена, ${err}`, false, true)
+      )
+      .finally(() => {
+        setShowLoading('');
+        closeAllPopups();
+      });
   };
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <Header />
-        <CardsContext.Provider value={cards}>
-          <Main
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-          />
-        </CardsContext.Provider>
+        <Main
+          onEditProfile={handleEditProfileClick}
+          onAddPlace={handleAddPlaceClick}
+          onEditAvatar={handleEditAvatarClick}
+          onCardClick={handleCardClick}
+          onCardLike={handleCardLike}
+          onCardDelete={handleCardDelete}
+          cards={cards}
+        />
         <Footer />
         <PopupWithForm
           name="confirm-delete"
@@ -189,41 +235,22 @@ function App() {
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar}
+          onLoading={showLoading}
         />
         <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
           onClose={closeAllPopups}
           onUpdateUser={handleUpdateUser}
+          onLoading={showLoading}
         />
-        <PopupWithForm
-          name="add-pic"
-          title="Новое место"
+        <AddPlacePopup
           isOpen={isAddPlacePopupOpen}
           onClose={closeAllPopups}
-          buttonText="Создать"
-        >
-          <input
-            className="popup__input popup__input_el_pic-name"
-            name="name"
-            id="input-pic-name"
-            type="text"
-            placeholder="Название"
-            minLength="2"
-            maxLength="30"
-            required
-          />
-          <span className="input-pic-name-error popup__input-error"></span>
-          <input
-            className="popup__input popup__input_el_pic-url"
-            name="link"
-            id="input-pic-url"
-            type="url"
-            placeholder="Ссылка на картинку"
-            required
-          />
-          <span className="input-pic-url-error popup__input-error"></span>
-        </PopupWithForm>
+          onAddCard={handleAddPlaceSubmit}
+          onLoading={showLoading}
+        />
         <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        <Notification onAction={notification} />
       </div>
     </CurrentUserContext.Provider>
   );

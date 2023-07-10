@@ -13,7 +13,7 @@ export function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   }
 
   function handleDeleteClick() {
-    onCardDelete(card)
+    onCardDelete(card);
   }
 
   //проверяем карточка моя или нет
@@ -23,10 +23,6 @@ export function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   const isLiked = card.likes.some((like) => {
     return like._id === myId;
   });
-
-  // console.log(isLiked);
-  // console.log(`myId:${myId}, cardOwnerId: ${card.owner._id}`);
-  // console.log(card);
 
   return (
     <div className="cards__item">
@@ -51,7 +47,11 @@ export function Card({ card, onCardClick, onCardLike, onCardDelete }) {
         </div>
         {/* если id карточки и мой id совпадают показываем кнопку удаления */}
         {isOwn && (
-          <button className="cards__trash-button" type="button" onClick={handleDeleteClick}></button>
+          <button
+            className="cards__trash-button"
+            type="button"
+            onClick={handleDeleteClick}
+          ></button>
         )}
       </div>
     </div>

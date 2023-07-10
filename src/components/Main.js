@@ -1,6 +1,5 @@
 import React from 'react';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { CardsContext } from '../contexts/CardsContext';
 import { Card } from './Card';
 
 export function Main({
@@ -10,10 +9,10 @@ export function Main({
   onCardClick,
   onCardLike,
   onCardDelete,
+  cards,
 }) {
   //Передаем в хук контекст. с полученными данными с сервера и подставляем данные куда нужно
   const currentUser = React.useContext(CurrentUserContext);
-  const cards = React.useContext(CardsContext);
   return (
     <main className="content">
       <section className="profile">
