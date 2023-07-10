@@ -2,25 +2,22 @@ import { useState, useEffect } from 'react';
 import { PopupWithForm } from './PopupWithForm';
 
 export function AddPlacePopup({ isOpen, onClose, onAddCard, onLoading }) {
-  const [link, setLink] = useState('');
-  const [name, setName] = useState('');
+  const [inputsValues, setInputsValues] = useState({ name: '', link: '' });
 
-  const handleChangeCardName = (evt) => {
-    setName(evt.target.value);
-  };
-
-  const handleChangeCardLink = (evt) => {
-    setLink(evt.target.value);
+  const handleChange = (evt) => {
+    setInputsValues((previousValues) => ({
+      ...previousValues,
+      [evt.target.name]: evt.target.value,
+    }));
   };
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    onAddCard({ name, link });
+    onAddCard(inputsValues);
   };
 
   useEffect(() => {
-    setName('');
-    setLink('');
+    setInputsValues({ name: '', link: '' });
   }, [onClose]);
 
   return (
@@ -40,8 +37,8 @@ export function AddPlacePopup({ isOpen, onClose, onAddCard, onLoading }) {
         placeholder="Название"
         minLength="2"
         maxLength="30"
-        value={name}
-        onChange={handleChangeCardName}
+        value={inputsValues.name}
+        onChange={handleChange}
         required
       />
       <span className="input-pic-name-error popup__input-error"></span>
@@ -51,8 +48,8 @@ export function AddPlacePopup({ isOpen, onClose, onAddCard, onLoading }) {
         id="input-pic-url"
         type="url"
         placeholder="Ссылка на картинку"
-        value={link}
-        onChange={handleChangeCardLink}
+        value={inputsValues.link}
+        onChange={handleChange}
         required
       />
       <span className="input-pic-url-error popup__input-error"></span>

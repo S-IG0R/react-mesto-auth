@@ -7,31 +7,30 @@ export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
   const currentUser = useContext(CurrentUserContext);
 
   //состояния инпутов
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [inputsValues, setInputsValues] = useState({ name: '', about: '' });
 
-  //обработка инпута с именем
-  const handleChangeName = (evt) => {
-    setName(evt.target.value);
-  };
-
-  //обработка инпута описания
-  const handleChangeDescription = (evt) => {
-    setDescription(evt.target.value);
+  //обработка инаутов
+  const handleChange = (evt) => {
+    setInputsValues((previousValues) => ({
+      ...previousValues,
+      [evt.target.name]: evt.target.value,
+    }));
   };
 
   //обработка сабмита формы
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    //передаем данные из инпутов в переданную функцию
-    onUpdateUser({ name, about: description });
+    //передаем данные из инпутов в обработчик api запроса
+    onUpdateUser(inputsValues);
   };
 
   //установка данных пользователя в инпуты
   useEffect(() => {
-    setName(currentUser?.name ?? ''); // оператор нулевого слияния
-    setDescription(currentUser?.about ?? ''); // оператор нулевого слияния
-  }, [currentUser, onClose]);
+    setInputsValues({
+      name: currentUser?.name ?? '',
+      about: currentUser?.about ?? '',
+    });
+  }, [currentUser, isOpen]);
 
   return (
     <PopupWithForm
@@ -50,21 +49,21 @@ export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
         placeholder="Имя"
         minLength="2"
         maxLength="40"
-        value={name}
-        onChange={handleChangeName}
+        value={inputsValues.name}
+        onChange={handleChange}
         required
       />
       <span className="input-name-error popup__input-error"></span>
       <input
         className="popup__input popup__input_el_job"
-        name="job"
+        name="about" // job
         id="input-job"
         type="text"
         placeholder="Род деятельности"
         minLength="2"
         maxLength="200"
-        value={description}
-        onChange={handleChangeDescription}
+        value={inputsValues.about}
+        onChange={handleChange}
         required
       />
       <span className="input-job-error popup__input-error"></span>

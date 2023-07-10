@@ -2,14 +2,14 @@ import React from 'react';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 export function Card({ card, onCardClick, onCardLike, onCardDelete }) {
-  const { _id: myId } = React.useContext(CurrentUserContext);
+  const currentUser = React.useContext(CurrentUserContext);
 
   function handleClick() {
     onCardClick(card);
   }
 
   function handleLikeClick() {
-    onCardLike(card, myId);
+    onCardLike(card, currentUser?._id);
   }
 
   function handleDeleteClick() {
@@ -17,11 +17,11 @@ export function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   }
 
   //проверяем карточка моя или нет
-  const isOwn = card.owner._id === myId;
+  const isOwn = card.owner._id === currentUser?._id;
 
   //проверяем есть ли мои лайки на в массиве лайков
   const isLiked = card.likes.some((like) => {
-    return like._id === myId;
+    return like._id === currentUser?._id;
   });
 
   return (

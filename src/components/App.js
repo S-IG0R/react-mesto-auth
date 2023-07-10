@@ -111,105 +111,124 @@ function App() {
   };
 
   //обработка лайка
-  const handleCardLike = (card, myId) => {
-    //проверяем есть ли лайк
-    const isLiked = card.likes.some((like) => {
-      return like._id === myId;
-    });
+  const handleCardLike = React.useCallback(
+    (card, myId) => {
+      //проверяем есть ли лайк
+      const isLiked = card.likes.some((like) => {
+        return like._id === myId;
+      });
 
-    isLiked
-      ? api
-          .deleteLike(card._id)
-          .then((newCardData) => {
-            setCards((stateCards) => {
-              return stateCards.map((cardInState) => {
-                return cardInState._id === card._id ? newCardData : cardInState;
+      isLiked
+        ? api
+            .deleteLike(card._id)
+            .then((newCardData) => {
+              setCards((cardsInState) => {
+                return cardsInState.map((cardInState) => {
+                  return cardInState._id === card._id
+                    ? newCardData
+                    : cardInState;
+                });
               });
-            });
-          })
-          .catch((err) => console.log(err))
-      : api
-          .putLike(card._id)
-          .then((newCardData) => {
-            setCards((stateCards) => {
-              return stateCards.map((cardInState) => {
-                return cardInState._id === card._id ? newCardData : cardInState;
+            })
+            .catch((err) => console.log(err))
+        : api
+            .putLike(card._id)
+            .then((newCardData) => {
+              setCards((cardsInState) => {
+                return cardsInState.map((cardInState) => {
+                  return cardInState._id === card._id
+                    ? newCardData
+                    : cardInState;
+                });
               });
-            });
-          })
-          .catch((err) => console.log(err));
-  };
+            })
+            .catch((err) => console.log(err));
+    },
+    [setCards]
+  );
 
   //обработка передачи данных на сервер удаления карточки
-  const handleCardDelete = (card) => {
-    api
-      .deleteCard(card._id)
-      .then(() => {
-        setCards((state) => {
-          return state.filter((cardInState) => {
-            return cardInState._id !== card._id;
+  const handleCardDelete = React.useCallback(
+    (card) => {
+      api
+        .deleteCard(card._id)
+        .then(() => {
+          setCards((state) => {
+            return state.filter((cardInState) => {
+              return cardInState._id !== card._id;
+            });
           });
-        });
-        showNotification('Карточка удалена', true, true);
-      })
-      .catch((err) =>
-        showNotification(`Карточка не удалена, ${err}`, false, true)
-      );
-  };
+          showNotification('Карточка удалена', true, true);
+        })
+        .catch((err) =>
+          showNotification(`Карточка не удалена, ${err}`, false, true)
+        );
+    },
+    [setCards]
+  );
 
   //обработка передачи на сервер обновлению данных пользователя
-  const handleUpdateUser = ({ name, about }) => {
-    setShowLoading('...');
-    api
-      .setProfileData({ name, about })
-      .then((newUserData) => {
-        setCurrentUser(newUserData);
-        showNotification('Данные пользователя обновлены', true, true);
-      })
-      .catch((err) =>
-        showNotification(`Данные не обновлены, ${err}`, false, true)
-      )
-      .finally(() => {
-        setShowLoading('');
-        closeAllPopups();
-      });
-  };
+  const handleUpdateUser = React.useCallback(
+    ({ name, about }) => {
+      setShowLoading('...');
+      api
+        .setProfileData({ name, about })
+        .then((newUserData) => {
+          setCurrentUser(newUserData);
+          showNotification('Данные пользователя обновлены', true, true);
+        })
+        .catch((err) =>
+          showNotification(`Данные не обновлены, ${err}`, false, true)
+        )
+        .finally(() => {
+          setShowLoading('');
+          closeAllPopups();
+        });
+    },
+    [setCurrentUser]
+  );
 
   //обработка передачи данных на сервер нового аватара
-  const handleUpdateAvatar = (avatar) => {
-    setShowLoading('...');
-    api
-      .setUserAvatar(avatar)
-      .then((newUserData) => {
-        setCurrentUser(newUserData);
-        showNotification('Аватар обновлен', true, true);
-      })
-      .catch((err) =>
-        showNotification(`Аватар не обновлен, ${err}`, false, true)
-      )
-      .finally(() => {
-        setShowLoading('');
-        closeAllPopups();
-      });
-  };
+  const handleUpdateAvatar = React.useCallback(
+    (avatar) => {
+      setShowLoading('...');
+      api
+        .setUserAvatar(avatar)
+        .then((newUserData) => {
+          setCurrentUser(newUserData);
+          showNotification('Аватар обновлен', true, true);
+        })
+        .catch((err) =>
+          showNotification(`Аватар не обновлен, ${err}`, false, true)
+        )
+        .finally(() => {
+          setShowLoading('');
+          closeAllPopups();
+        });
+    },
+    [setCurrentUser]
+  );
 
   //обработка передачи данных на сервер добавления новый карточки
-  const handleAddPlaceSubmit = (inputValues) => {
-    setShowLoading('...');
-    api
-      .addNewCard(inputValues)
-      .then((newCard) => {
-        setCards([newCard, ...cards]);
-        showNotification('Новая карточка добавлена', true, true);
-      })
-      .catch((err) =>
-        showNotification(`Новая карточка не добавлена, ${err}`, false, true)
-      )
-      .finally(() => {
-        setShowLoading('');
-        closeAllPopups();
-      });
-  };
+  const handleAddPlaceSubmit = React.useCallback(
+    (inputValues) => {
+      setShowLoading('...');
+      api
+        .addNewCard(inputValues)
+        .then((newCard) => {
+          setCards([newCard, ...cards]);
+          showNotification('Новая карточка добавлена', true, true);
+        })
+        .catch((err) =>
+          showNotification(`Новая карточка не добавлена, ${err}`, false, true)
+        )
+        .finally(() => {
+          setShowLoading('');
+          closeAllPopups();
+        });
+    },
+    [cards]
+  );
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
