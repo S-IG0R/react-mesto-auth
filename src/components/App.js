@@ -29,56 +29,15 @@ function App() {
   // Состояние попапа с картинкой
   const [selectedCard, setSelectedCard] = React.useState(null);
 
-  //забираем массив данных пользователя при загрузке приложения
+  // Забираем данные карточек и пользователя при загрузке приложения
   React.useEffect(() => {
-    api
-      .getUserInfo()
-      .then((userData) => {
+    Promise.all([api.getUserInfo(), api.getInitialCards()])
+      .then(([userData, cardsData]) => {
         setCurrentUser(userData);
-      })
-      .catch((err) => console.log(err));
-  }, []);
-
-  // Забираем данные карточек при загрузке приложения
-  React.useEffect(() => {
-    api
-      .getInitialCards()
-      .then((cardsData) => {
         setCards(cardsData);
       })
       .catch((err) => console.log(err));
   }, []);
-
-  // Проверка открыт ли хоть один попап
-  const isAnyPopupOpen = React.useMemo(() => {
-    return (
-      isEditProfilePopupOpen ||
-      isAddPlacePopupOpen ||
-      isEditAvatarPopupOpen ||
-      selectedCard
-    );
-  }, [
-    isEditProfilePopupOpen,
-    isAddPlacePopupOpen,
-    isEditAvatarPopupOpen,
-    selectedCard,
-  ]);
-
-  // Закрытие попапа по Esc
-  React.useEffect(() => {
-    if (isAnyPopupOpen) {
-      const handleEsc = (evt) => {
-        if (evt.key === 'Escape') {
-          closeAllPopups();
-        }
-      };
-      document.addEventListener('keydown', handleEsc);
-
-      return () => {
-        document.removeEventListener('keydown', handleEsc);
-      };
-    }
-  }, [isAnyPopupOpen]);
 
   // Обработчик закрытия крестиком для всех попапов
   const closeAllPopups = () => {
@@ -118,6 +77,7 @@ function App() {
         return like._id === myId;
       });
 
+      //если isLiked вернула true - убираем, false - ставим
       isLiked
         ? api
             .deleteLike(card._id)
@@ -176,13 +136,13 @@ function App() {
         .then((newUserData) => {
           setCurrentUser(newUserData);
           showNotification('Данные пользователя обновлены', true, true);
+          closeAllPopups();
         })
         .catch((err) =>
           showNotification(`Данные не обновлены, ${err}`, false, true)
         )
         .finally(() => {
           setShowLoading('');
-          closeAllPopups();
         });
     },
     [setCurrentUser]
@@ -197,13 +157,13 @@ function App() {
         .then((newUserData) => {
           setCurrentUser(newUserData);
           showNotification('Аватар обновлен', true, true);
+          closeAllPopups();
         })
         .catch((err) =>
           showNotification(`Аватар не обновлен, ${err}`, false, true)
         )
         .finally(() => {
           setShowLoading('');
-          closeAllPopups();
         });
     },
     [setCurrentUser]
@@ -218,13 +178,13 @@ function App() {
         .then((newCard) => {
           setCards([newCard, ...cards]);
           showNotification('Новая карточка добавлена', true, true);
+          closeAllPopups();
         })
         .catch((err) =>
           showNotification(`Новая карточка не добавлена, ${err}`, false, true)
         )
         .finally(() => {
           setShowLoading('');
-          closeAllPopups();
         });
     },
     [cards]

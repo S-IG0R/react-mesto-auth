@@ -1,24 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { PopupWithForm } from './PopupWithForm';
+import { useForm } from '../hooks/useForm';
 
 export function AddPlacePopup({ isOpen, onClose, onAddCard, onLoading }) {
-  const [inputsValues, setInputsValues] = useState({ name: '', link: '' });
-
-  const handleChange = (evt) => {
-    setInputsValues((previousValues) => ({
-      ...previousValues,
-      [evt.target.name]: evt.target.value,
-    }));
-  };
+  //импорт кастомного хука
+  const { values, setValues, handleChange } = useForm({ name: '', link: '' });
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    onAddCard(inputsValues);
+    onAddCard(values);
   };
 
   useEffect(() => {
-    setInputsValues({ name: '', link: '' });
-  }, [onClose]);
+    //проверяем открыт ли попап
+    if (isOpen) {
+      setValues({ name: '', link: '' });
+    }
+  }, [isOpen, setValues]);
 
   return (
     <PopupWithForm
@@ -37,7 +35,7 @@ export function AddPlacePopup({ isOpen, onClose, onAddCard, onLoading }) {
         placeholder="Название"
         minLength="2"
         maxLength="30"
-        value={inputsValues.name}
+        value={values.name}
         onChange={handleChange}
         required
       />
@@ -48,7 +46,7 @@ export function AddPlacePopup({ isOpen, onClose, onAddCard, onLoading }) {
         id="input-pic-url"
         type="url"
         placeholder="Ссылка на картинку"
-        value={inputsValues.link}
+        value={values.link}
         onChange={handleChange}
         required
       />

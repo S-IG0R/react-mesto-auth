@@ -1,36 +1,32 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { PopupWithForm } from './PopupWithForm';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import { useForm } from '../hooks/useForm';
 
 export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
   //подписка на контекст данных о пользователе
   const currentUser = useContext(CurrentUserContext);
 
-  //состояния инпутов
-  const [inputsValues, setInputsValues] = useState({ name: '', about: '' });
-
-  //обработка инаутов
-  const handleChange = (evt) => {
-    setInputsValues((previousValues) => ({
-      ...previousValues,
-      [evt.target.name]: evt.target.value,
-    }));
-  };
+  //импорт кастомного хука обрабатывающего инпуты
+  const { values, setValues, handleChange } = useForm({ name: '', about: '' });
 
   //обработка сабмита формы
   const handleSubmit = (evt) => {
     evt.preventDefault();
     //передаем данные из инпутов в обработчик api запроса
-    onUpdateUser(inputsValues);
+    onUpdateUser(values);
   };
 
   //установка данных пользователя в инпуты
   useEffect(() => {
-    setInputsValues({
-      name: currentUser?.name ?? '',
-      about: currentUser?.about ?? '',
-    });
-  }, [currentUser, isOpen]);
+    //проверяем открыт ли попап 
+    if (isOpen) {
+      setValues({
+        name: currentUser?.name ?? '',
+        about: currentUser?.about ?? '',
+      });
+    }
+  }, [currentUser, isOpen, setValues]);
 
   return (
     <PopupWithForm
@@ -49,7 +45,7 @@ export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
         placeholder="Имя"
         minLength="2"
         maxLength="40"
-        value={inputsValues.name}
+        value={values.name}
         onChange={handleChange}
         required
       />
@@ -62,7 +58,7 @@ export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
         placeholder="Род деятельности"
         minLength="2"
         maxLength="200"
-        value={inputsValues.about}
+        value={values.about}
         onChange={handleChange}
         required
       />

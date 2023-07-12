@@ -1,13 +1,14 @@
+import { usePopupClose } from '../hooks/usePopupClose';
+
 export function ImagePopup({ card, onClose }) {
-  const handleClickToOverlay = (evt) => {
-    if (evt.target === evt.currentTarget) {
-      onClose();
-    }
-  };
+
+  //импорт кастомного хука, в качестве первого аргумента проверка если ссылка
+  //служит как индикатор открытого поапа, потому что не передается isOpen
+  usePopupClose(card?.link, onClose);
+
   return (
     <section
       className={`popup popup_type_view-photo ${card && 'popup_opened'}`}
-      onClick={handleClickToOverlay}
     >
       <div className="popup__container popup__container_type_zoom-photo">
         <img className="popup__image" src={card?.link} alt={card?.name} />

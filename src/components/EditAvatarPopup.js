@@ -17,8 +17,11 @@ export function EditAvatarPopup({
   };
 
   useEffect(() => {
-    inputRef.current.value = '';
-  }, [onClose]);
+    //проверяем открыт ли попап
+    if (isOpen) {
+      inputRef.current.value = '';
+    }
+  }, [isOpen]);
 
   return (
     <PopupWithForm

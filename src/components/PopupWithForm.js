@@ -1,3 +1,5 @@
+import { usePopupClose } from '../hooks/usePopupClose';
+
 export function PopupWithForm({
   name,
   title,
@@ -7,29 +9,18 @@ export function PopupWithForm({
   buttonText,
   onSubmit,
 }) {
-  const handleClickToOverlay = (evt) => {
-    if (evt.target === evt.currentTarget) {
-      onClose();
-    }
-  };
+  
+  usePopupClose(isOpen, onClose);
 
   return (
-    <section
-      className={`popup popup_type_${name} ${isOpen && `popup_opened`}`}
-      onClick={handleClickToOverlay}
-    >
+    <section className={`popup popup_type_${name} ${isOpen && `popup_opened`}`}>
       <div className="popup__container">
         <p className="popup__title">{title}</p>
-        <button
-          className="popup__close-btn"
-          type="button"
-          onClick={onClose}
-        ></button>
+        <button className="popup__close-btn" type="button" onClick={onClose} />
         <form
           className={`popup__form popup__form_type_${name}`}
-          name="popup-form"
+          name={`${name}-form`}
           onSubmit={onSubmit}
-          noValidate
         >
           {children}
           <button className="popup__submit-btn" type="submit">
