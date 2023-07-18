@@ -19,7 +19,7 @@ export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
 
   //установка данных пользователя в инпуты
   useEffect(() => {
-    //проверяем открыт ли попап 
+    //проверяем открыт ли попап
     if (isOpen) {
       setValues({
         name: currentUser?.name ?? '',
@@ -52,7 +52,7 @@ export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
       <span className="input-name-error popup__input-error"></span>
       <input
         className="popup__input popup__input_el_job"
-        name="about" // job
+        name="about"
         id="input-job"
         type="text"
         placeholder="Род деятельности"
@@ -62,7 +62,7 @@ export function EditProfilePopup({ isOpen, onClose, onUpdateUser, onLoading }) {
         onChange={handleChange}
         required
       />
-      <span className="input-job-error popup__input-error"></span>
+      <span className="input-name-error popup__input-error"></span>
     </PopupWithForm>
   );
 }

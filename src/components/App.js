@@ -2,7 +2,6 @@ import React from 'react';
 import { Header } from './Header';
 import { Main } from './Main';
 import { Footer } from './Footer';
-import { PopupWithForm } from './PopupWithForm';
 import { ImagePopup } from './ImagePopup';
 import { api } from '../utils/Api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
@@ -10,6 +9,7 @@ import { EditProfilePopup } from './EditProfilePopup';
 import { EditAvatarPopup } from './EditAvatarPopup';
 import { AddPlacePopup } from './AddPlacePopup';
 import { Notification } from './Notification';
+import { PopupWithConfirmation } from './PopupWithConfirmation';
 
 function App() {
   // Состояние всплывающего уведомления
@@ -24,6 +24,7 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
     React.useState(false);
+  const [cardToDelete, setCardToDelete] = React.useState(null);
   // Состояние данных карточек
   const [cards, setCards] = React.useState([]);
   // Состояние попапа с картинкой
@@ -45,6 +46,7 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedCard(null);
+    setCardToDelete(null);
   };
 
   // Обработчики открытия попапов
@@ -109,22 +111,35 @@ function App() {
 
   //обработка передачи данных на сервер удаления карточки
   const handleCardDelete = React.useCallback(
-    (card) => {
+    (cardToDelete) => {
+      setShowLoading('...');
       api
-        .deleteCard(card._id)
+        .deleteCard(cardToDelete._id)
         .then(() => {
           setCards((state) => {
             return state.filter((cardInState) => {
-              return cardInState._id !== card._id;
+              return cardInState._id !== cardToDelete._id;
             });
           });
           showNotification('Карточка удалена', true, true);
+          closeAllPopups();
         })
         .catch((err) =>
           showNotification(`Карточка не удалена, ${err}`, false, true)
-        );
+        )
+        .finally(() => {
+          setShowLoading('');
+        }); 
     },
     [setCards]
+  );
+
+  //обработка клика по корзине
+  const handleClickDelete = React.useCallback(
+    (card) => {
+      setCardToDelete(card);
+    },
+    [setCardToDelete]
   );
 
   //обработка передачи на сервер обновлению данных пользователя
@@ -200,15 +215,15 @@ function App() {
           onEditAvatar={handleEditAvatarClick}
           onCardClick={handleCardClick}
           onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}
+          onClickDelete={handleClickDelete}
           cards={cards}
         />
         <Footer />
-        <PopupWithForm
-          name="confirm-delete"
-          title="Вы уверены?"
+        <PopupWithConfirmation
           onClose={closeAllPopups}
-          buttonText="Да"
+          isOpen={cardToDelete}
+          onLoading={showLoading}
+          onConfirm={handleCardDelete}
         />
         <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}

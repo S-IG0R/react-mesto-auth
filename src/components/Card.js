@@ -1,7 +1,7 @@
 import React from 'react';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
-export function Card({ card, onCardClick, onCardLike, onCardDelete }) {
+export function Card({ card, onCardClick, onCardLike, onClickDelete }) {
   const currentUser = React.useContext(CurrentUserContext);
 
   function handleClick() {
@@ -13,7 +13,7 @@ export function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   }
 
   function handleDeleteClick() {
-    onCardDelete(card);
+    onClickDelete(card);
   }
 
   //проверяем карточка моя или нет

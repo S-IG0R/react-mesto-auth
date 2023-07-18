@@ -8,7 +8,7 @@ export function Main({
   onEditAvatar,
   onCardClick,
   onCardLike,
-  onCardDelete,
+  onClickDelete,
   cards,
 }) {
   //Передаем в хук контекст. с полученными данными с сервера и подставляем данные куда нужно
@@ -48,7 +48,7 @@ export function Main({
               card={card}
               onCardClick={onCardClick}
               onCardLike={onCardLike}
-              onCardDelete={onCardDelete}
+              onClickDelete={onClickDelete}
             />
           );
         })}
