@@ -3,6 +3,7 @@ import { Header } from './Header';
 import { Main } from './Main';
 import { Footer } from './Footer';
 import { ImagePopup } from './ImagePopup';
+import { Login } from './Login';
 import { api } from '../utils/Api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { EditProfilePopup } from './EditProfilePopup';
@@ -209,7 +210,8 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <Header />
-        <Main
+        <Login/>
+        {/* <Main
           onEditProfile={handleEditProfileClick}
           onAddPlace={handleAddPlaceClick}
           onEditAvatar={handleEditAvatarClick}
@@ -218,7 +220,7 @@ function App() {
           onClickDelete={handleClickDelete}
           cards={cards}
         />
-        <Footer />
+        <Footer /> */}
         <PopupWithConfirmation
           onClose={closeAllPopups}
           isOpen={cardToDelete}
