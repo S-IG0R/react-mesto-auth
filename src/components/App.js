@@ -1,4 +1,5 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { Header } from './Header';
 import { Main } from './Main';
 import { Footer } from './Footer';
@@ -11,8 +12,12 @@ import { EditAvatarPopup } from './EditAvatarPopup';
 import { AddPlacePopup } from './AddPlacePopup';
 import { Notification } from './Notification';
 import { PopupWithConfirmation } from './PopupWithConfirmation';
+import { Register } from './Register';
+import { Navigate } from 'react-router-dom';
+import { ProtectedRoute } from './ProtectedRoute';
 
 function App() {
+  const [loggedIn, setLoggedIn] = React.useState(false);
   // Состояние всплывающего уведомления
   const [notification, setNotification] = React.useState(null);
   // Состояние процесса загрузки на сервер
@@ -33,12 +38,14 @@ function App() {
 
   // Забираем данные карточек и пользователя при загрузке приложения
   React.useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getInitialCards()])
-      .then(([userData, cardsData]) => {
-        setCurrentUser(userData);
-        setCards(cardsData);
-      })
-      .catch((err) => console.log(err));
+    if (loggedIn) {
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
+        .then(([userData, cardsData]) => {
+          setCurrentUser(userData);
+          setCards(cardsData);
+        })
+        .catch((err) => console.log(err));
+      }
   }, []);
 
   // Обработчик закрытия крестиком для всех попапов
@@ -130,7 +137,7 @@ function App() {
         )
         .finally(() => {
           setShowLoading('');
-        }); 
+        });
     },
     [setCards]
   );
@@ -206,46 +213,65 @@ function App() {
     [cards]
   );
 
+  const paths = {
+    login: '/sign-in',
+    registration: '/sign-up',
+    main: '/',
+  };
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header />
-        <Login/>
-        {/* <Main
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onEditAvatar={handleEditAvatarClick}
-          onCardClick={handleCardClick}
-          onCardLike={handleCardLike}
-          onClickDelete={handleClickDelete}
-          cards={cards}
+        <Header 
+           paths={paths}
         />
-        <Footer /> */}
-        <PopupWithConfirmation
-          onClose={closeAllPopups}
-          isOpen={cardToDelete}
-          onLoading={showLoading}
-          onConfirm={handleCardDelete}
-        />
-        <EditAvatarPopup
-          isOpen={isEditAvatarPopupOpen}
-          onClose={closeAllPopups}
-          onUpdateAvatar={handleUpdateAvatar}
-          onLoading={showLoading}
-        />
-        <EditProfilePopup
-          isOpen={isEditProfilePopupOpen}
-          onClose={closeAllPopups}
-          onUpdateUser={handleUpdateUser}
-          onLoading={showLoading}
-        />
-        <AddPlacePopup
-          isOpen={isAddPlacePopupOpen}
-          onClose={closeAllPopups}
-          onAddCard={handleAddPlaceSubmit}
-          onLoading={showLoading}
-        />
-        <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        <Routes>
+          <Route path="*" element={loggedIn ? <Navigate to={paths.main} replace /> : <Navigate to={paths.login} replace/>} />
+          <Route path={paths.login} element={<Login />} />
+          <Route path={paths.registration} element={<Register redirectPath={paths}/>} />
+          <Route
+            path={paths.main}
+            element={
+              <ProtectedRoute redirectPath={paths.login} loggedIn={loggedIn}>
+                <Main
+                  onEditProfile={handleEditProfileClick}
+                  onAddPlace={handleAddPlaceClick}
+                  onEditAvatar={handleEditAvatarClick}
+                  onCardClick={handleCardClick}
+                  onCardLike={handleCardLike}
+                  onClickDelete={handleClickDelete}
+                  cards={cards}
+                />
+                <Footer />
+                <PopupWithConfirmation
+                  onClose={closeAllPopups}
+                  isOpen={cardToDelete}
+                  onLoading={showLoading}
+                  onConfirm={handleCardDelete}
+                />
+                <EditAvatarPopup
+                  isOpen={isEditAvatarPopupOpen}
+                  onClose={closeAllPopups}
+                  onUpdateAvatar={handleUpdateAvatar}
+                  onLoading={showLoading}
+                />
+                <EditProfilePopup
+                  isOpen={isEditProfilePopupOpen}
+                  onClose={closeAllPopups}
+                  onUpdateUser={handleUpdateUser}
+                  onLoading={showLoading}
+                />
+                <AddPlacePopup
+                  isOpen={isAddPlacePopupOpen}
+                  onClose={closeAllPopups}
+                  onAddCard={handleAddPlaceSubmit}
+                  onLoading={showLoading}
+                />
+                <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
         <Notification onAction={notification} />
       </div>
     </CurrentUserContext.Provider>

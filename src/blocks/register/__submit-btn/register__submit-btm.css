@@ -1,4 +1,4 @@
-.login__submit-btn {
+.register__submit-btn {
   min-height: 50px;
   border-radius: 2px;
   border: none;
@@ -14,12 +14,12 @@
   transition: opacity 0.5s;
 }
 
-.login__submit-btn:hover {
+.register__submit-btn:hover {
   opacity: 0.85;
 }
 
 @media (max-width: 767.98px) {
-  .login__submit-btn {
+  .register__submit-btn {
     margin-top: 173px;
     font-size: 16px;
     min-height: 46px;
