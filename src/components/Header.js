@@ -1,8 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../images/logo.svg';
 
-export function Header({ paths }) {
-  const { login, registration, main } = paths;
+export function Header({ paths, userInfo, onSignOut }) {
+  const { login, registration } = paths;
 
   const { pathname } = useLocation();
 
@@ -19,24 +19,31 @@ export function Header({ paths }) {
     pathData.link = login;
     pathData.caption = 'Войти';
   }
-  if (pathname === main) {
+  if (userInfo) {
     pathData.link = login;
     pathData.caption = 'Выйти';
   }
 
-  const handleClick = () => {console.log('dffdd')};
+  const handleLogout = () => {
+    onSignOut()
+  };
 
   return (
     <header className="header">
       <div className="header__container">
         <img className="logo" src={logo} alt="Логотип Место" />
-        <Link
-          to={pathData.link}
-          className="header__link"
-          onClick={pathname === main ? handleClick : ''}
-        >
-          {pathData.caption}
-        </Link>
+        <div className="header__userinfo">
+          {userInfo?.data?.email && (
+            <p className="header__email">{userInfo?.data?.email}</p>
+          )}
+          <Link
+            to={pathData.link}
+            className="header__link"
+            onClick={userInfo?.data?.email ? handleLogout : ''}
+          >
+            {pathData.caption}
+          </Link>
+        </div>
       </div>
     </header>
   );

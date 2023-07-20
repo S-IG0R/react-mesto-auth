@@ -1,20 +1,13 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from '../hooks/useForm';
-import { registration } from '../utils/Auth';
 
-export const Register = ({ redirectPath }) => {
-  const { login } = redirectPath;
+export const Register = ({ onSubmit }) => {
+  
   const { values, handleChange } = useForm({ email: '', password: '' });
-  const navigate = useNavigate();
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    registration(values.email, values.password)
-      .then((res) => {    
-        console.log(res);
-          navigate(login, { replace: true });
-      })
-      .catch((err) => console.log(err));
+    onSubmit(values.email, values.password);
   };
   return (
     <section className="register">

@@ -1,17 +1,13 @@
 import { useForm } from '../hooks/useForm';
-import { login } from '../utils/Auth';
 
-export const Login = () => {
+
+export const Login = ({onSubmit}) => {
+
   const { values, handleChange } = useForm({ email: '', password: '' });
+
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    login(values.email, values.password)
-      .then((data) => {
-        if(data.token){
-          localStorage.setItem('jwt', data.token);
-          console.log(data.token);
-        }
-    });
+    onSubmit(values.email, values.password)
   };
   return (
     <section className="login">

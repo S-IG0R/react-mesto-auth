@@ -10,6 +10,17 @@ export const login = (email, password) => {
   .then(getResponse);
 };
 
+export const checkToken = (token) => {
+  return fetch(`${BASE_URL}/users/me`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization' : `Bearer ${token}`
+    }
+  })
+  .then(getResponse)
+}
+
 const doRequest = (email, password) => {
   return {
     method: 'POST',
@@ -25,3 +36,4 @@ const getResponse = (res) => {
     ?  res.json() 
     :  Promise.reject(`произошла ошибка: ${res.status}`);
 };
+

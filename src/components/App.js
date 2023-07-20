@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Header } from './Header';
 import { Main } from './Main';
 import { Footer } from './Footer';
@@ -15,8 +15,11 @@ import { PopupWithConfirmation } from './PopupWithConfirmation';
 import { Register } from './Register';
 import { Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
+import { checkToken, login, registration } from '../utils/Auth';
 
 function App() {
+  const [userInfo, setUserInfo] = React.useState(null);
+  // состояние залогинен или нет
   const [loggedIn, setLoggedIn] = React.useState(false);
   // Состояние всплывающего уведомления
   const [notification, setNotification] = React.useState(null);
@@ -36,6 +39,64 @@ function App() {
   // Состояние попапа с картинкой
   const [selectedCard, setSelectedCard] = React.useState(null);
 
+  const navigate = useNavigate();
+
+  // пути приложения
+  const paths = {
+    login: '/sign-in',
+    registration: '/sign-up',
+    main: '/',
+  };
+
+  // обратка запроса на авторизацию
+  const handleLogin = (email, password) => {
+    login(email, password)
+      .then((data) => {
+        if (data.token) {
+          //сохраняем пароль в локальном хранилище
+          localStorage.setItem('jwt', data.token);
+          navigate(paths.main, { replace: true });
+          setLoggedIn(true);
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // обработка запроса на регистрацию
+  const handleRegistration = (email, password) => {
+    registration(email, password)
+      .then((res) => {
+        console.log(res);
+        navigate(paths.login, { replace: true });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // обработка выхода из приложения
+  const handleSignOut = () => {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+    setUserInfo(null);
+    setCurrentUser(null);
+    setCards([]);
+  }
+
+  // Проверка наличия токена при начальном загрузке приложения
+  React.useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      checkToken(token)
+        .then((res) => {
+          if (res) {
+            setLoggedIn(true);
+            navigate(paths.main, { replace: true });
+            setUserInfo(res)
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [loggedIn])
+
   // Забираем данные карточек и пользователя при загрузке приложения
   React.useEffect(() => {
     if (loggedIn) {
@@ -45,8 +106,9 @@ function App() {
           setCards(cardsData);
         })
         .catch((err) => console.log(err));
-      }
-  }, []);
+    }
+  }, [loggedIn]);
+
 
   // Обработчик закрытия крестиком для всех попапов
   const closeAllPopups = () => {
@@ -213,22 +275,23 @@ function App() {
     [cards]
   );
 
-  const paths = {
-    login: '/sign-in',
-    registration: '/sign-up',
-    main: '/',
-  };
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header 
-           paths={paths}
-        />
+        <Header paths={paths} userInfo={userInfo} onSignOut={handleSignOut}/>
         <Routes>
           <Route path="*" element={loggedIn ? <Navigate to={paths.main} replace /> : <Navigate to={paths.login} replace/>} />
-          <Route path={paths.login} element={<Login />} />
-          <Route path={paths.registration} element={<Register redirectPath={paths}/>} />
+          <Route
+            path={paths.login}
+            element={<Login onSubmit={handleLogin} />}
+          />
+          <Route
+            path={paths.registration}
+            element={
+              <Register redirectPath={paths} onSubmit={handleRegistration} />
+            }
+          />
           <Route
             path={paths.main}
             element={
