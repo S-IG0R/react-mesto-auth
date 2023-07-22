@@ -343,12 +343,12 @@ function App() {
           />
           <Route
             path={paths.login}
-            element={<Login onSubmit={handleLogin} />}
+            element={<Login onLogin={handleLogin} />}
           />
           <Route
             path={paths.registration}
             element={
-              <Register redirectPath={paths} onSubmit={handleRegistration} />
+              <Register redirectPath={paths} onRegistration={handleRegistration} />
             }
           />
           <Route

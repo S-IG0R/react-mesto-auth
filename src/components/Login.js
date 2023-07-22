@@ -1,13 +1,13 @@
 import { useForm } from '../hooks/useForm';
 
 
-export const Login = ({onSubmit}) => {
+export const Login = ({onLogin}) => {
 
   const { values, handleChange } = useForm({ email: '', password: '' });
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    onSubmit(values.email, values.password)
+    onLogin(values.email, values.password)
   };
   return (
     <section className="login">

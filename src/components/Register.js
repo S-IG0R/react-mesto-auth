@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useForm } from '../hooks/useForm';
 
-export const Register = ({ onSubmit }) => {
+export const Register = ({ onRegistration }) => {
   
   const { values, handleChange } = useForm({ email: '', password: '' });
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    onSubmit(values.email, values.password);
+    onRegistration(values.email, values.password);
   };
   return (
     <section className="register">

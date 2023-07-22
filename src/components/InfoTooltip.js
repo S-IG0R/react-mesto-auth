@@ -3,7 +3,9 @@ import errorIcon from '../images/error.svg';
 import successIcon from '../images/success.svg';
 
 export const InfoTooltip = ({ popupState, onClose }) => {
+
   usePopupClose(popupState.isOpen, onClose);
+  
   return (
     <section
       className={`popup popup_type_info ${
