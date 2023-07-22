@@ -1,50 +1,89 @@
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../images/logo.svg';
 
-export function Header({ paths, userInfo, onSignOut }) {
+export function Header({
+  paths,
+  headerInfo,
+  onSignOut,
+  onBurgerClick,
+  isOpenMenu,
+}) {
   const { login, registration } = paths;
 
   const { pathname } = useLocation();
 
-  const pathData = {
-    link: registration,
-    caption: 'Регистрация',
-  };
-
-  if (pathname === login) {
-    pathData.link = registration;
-    pathData.caption = 'Регистрация';
-  }
-  if (pathname === registration) {
-    pathData.link = login;
-    pathData.caption = 'Войти';
-  }
-  if (userInfo) {
-    pathData.link = login;
-    pathData.caption = 'Выйти';
-  }
-
-  const handleLogout = () => {
-    onSignOut()
+  const handleClickSignOut = () => {
+    onSignOut();
   };
 
   return (
-    <header className="header">
-      <div className="header__container">
-        <img className="logo" src={logo} alt="Логотип Место" />
-        <div className="header__userinfo">
-          {userInfo?.data?.email && (
-            <p className="header__email">{userInfo?.data?.email}</p>
-          )}
+    <>
+      {headerInfo && (
+        <div className={`header__menu ${isOpenMenu && 'header__menu_open'}`}>
+          <p className="header__email header__email_type_burger-menu">
+            {headerInfo?.data?.email}
+          </p>
           <Link
-            to={pathData.link}
+            to={login}
             className="header__link"
-            onClick={userInfo?.data?.email ? handleLogout : ''}
+            onClick={headerInfo ? handleClickSignOut : ''}
           >
-            {pathData.caption}
+            Выйти
           </Link>
         </div>
-      </div>
-    </header>
+      )}
+      <header className="header">
+        <div className="header__container">
+          <img className="logo" src={logo} alt="Логотип Место" />
+          <div className="header__userinfo">
+            {headerInfo?.data?.email && (
+              <p className="header__email header__email_type_classic-menu">
+                {headerInfo?.data?.email}
+              </p>
+            )}
+            {pathname === login ? (
+              <Link
+                to={registration}
+                className="header__link header__link_type_classic-menu"
+              >
+                Регистрация
+              </Link>
+            ) : (
+              ''
+            )}
+            {pathname === registration ? (
+              <Link
+                to={login}
+                className="header__link header__link_type_classic-menu"
+              >
+                Войти
+              </Link>
+            ) : (
+              ''
+            )}
+            {headerInfo ? (
+              <Link
+                role="button"
+                to={login}
+                onClick={headerInfo ? handleClickSignOut : ''}
+                className="header__link header__link_active"
+              >
+                Выйти
+              </Link>
+            ) : (
+              ''
+            )}
+            {headerInfo && (
+              <button
+                className={`header__burger-btn ${
+                  isOpenMenu && `header__burger-btn_active`
+                }`}
+                onClick={onBurgerClick}
+              />
+            )}
+          </div>
+        </div>
+      </header>
+    </>
   );
 }

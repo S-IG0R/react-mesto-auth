@@ -12,6 +12,7 @@
   line-height: normal;
   margin-top: 216px;
   transition: opacity 0.5s;
+  cursor: pointer;
 }
 
 .login__submit-btn:hover {

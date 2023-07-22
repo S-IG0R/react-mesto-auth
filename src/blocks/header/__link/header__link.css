@@ -1,5 +1,5 @@
 .header__link {
-  color: #fff;
+  color: #A9A9A9;
   text-align: right;
   font-family: 'Inter', 'Arial', 'Helvetica', sans-serif;
   font-size: 18px;
@@ -12,11 +12,4 @@
 
 .header__link:hover {
   opacity: 0.6;
-}
-
-@media (max-width: 767.98px) {
-  .header__link  {
-    font-size: 14px;
-    
-  }
 }

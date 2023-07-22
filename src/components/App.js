@@ -16,26 +16,40 @@ import { Register } from './Register';
 import { Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { checkToken, login, registration } from '../utils/Auth';
+import { InfoTooltip } from './InfoTooltip';
 
 function App() {
-  const [userInfo, setUserInfo] = React.useState(null);
+ 
+  // состояние меню бургер
+  const [isOpenMenu, setIsOpenMenu] = React.useState(false);
+
+  //данные для шапки
+  const [headerInfo, setHeaderInfo] = React.useState(null);
+
   // состояние залогинен или нет
   const [loggedIn, setLoggedIn] = React.useState(false);
+
   // Состояние всплывающего уведомления
   const [notification, setNotification] = React.useState(null);
+
   // Состояние процесса загрузки на сервер
   const [showLoading, setShowLoading] = React.useState('');
+
   // Состояние пользовательских данных
   const [currentUser, setCurrentUser] = React.useState(null);
+
   // Состояние попапов
+  const [isInfoPopupOpen, setIsInfoPopupOpen] = React.useState({isOpen: false, isSuccess: false});
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
     React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
     React.useState(false);
   const [cardToDelete, setCardToDelete] = React.useState(null);
+
   // Состояние данных карточек
   const [cards, setCards] = React.useState([]);
+
   // Состояние попапа с картинкой
   const [selectedCard, setSelectedCard] = React.useState(null);
 
@@ -53,35 +67,58 @@ function App() {
     login(email, password)
       .then((data) => {
         if (data.token) {
-          //сохраняем пароль в локальном хранилище
+          //если токен внутри сохраняем в локальном хранилище
           localStorage.setItem('jwt', data.token);
-          navigate(paths.main, { replace: true });
           setLoggedIn(true);
+          navigate(paths.main, { replace: true });
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setIsInfoPopupOpen({isOpen: true, isSuccess: false});
+      });
   };
 
   // обработка запроса на регистрацию
   const handleRegistration = (email, password) => {
     registration(email, password)
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         navigate(paths.login, { replace: true });
+        setIsInfoPopupOpen({isOpen: true, isSuccess: true});
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setIsInfoPopupOpen({isOpen: true, isSuccess: false});
+      });
   };
 
   // обработка выхода из приложения
   const handleSignOut = () => {
     localStorage.removeItem('jwt');
     setLoggedIn(false);
-    setUserInfo(null);
+    setHeaderInfo(null);
     setCurrentUser(null);
     setCards([]);
-  }
+    setIsOpenMenu(false);
+  };
+
+  // если ширина экрана больше указанной закрываем меню бургер
+  React.useEffect(() => {
+    const handleChangeWidth = (evt) => {
+      if (evt.target.outerWidth >= 767.98) {
+        setIsOpenMenu(false);
+      }
+    };
+    if (isOpenMenu) {
+      window.addEventListener('resize', handleChangeWidth);
+    }
+    return () => {
+      window.removeEventListener('resize', handleChangeWidth);
+    };
+  }, [isOpenMenu]);
 
   // Проверка наличия токена при начальном загрузке приложения
+  // достаем токен из хранилища, если токен на месте, отправляем, в случае успеха обратно прилетают данные 
   React.useEffect(() => {
     const token = localStorage.getItem('jwt');
     if (token) {
@@ -90,12 +127,12 @@ function App() {
           if (res) {
             setLoggedIn(true);
             navigate(paths.main, { replace: true });
-            setUserInfo(res)
+            setHeaderInfo(res);
           }
         })
         .catch((err) => console.log(err));
     }
-  }, [loggedIn])
+  }, [loggedIn]);
 
   // Забираем данные карточек и пользователя при загрузке приложения
   React.useEffect(() => {
@@ -109,7 +146,6 @@ function App() {
     }
   }, [loggedIn]);
 
-
   // Обработчик закрытия крестиком для всех попапов
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false);
@@ -117,6 +153,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setSelectedCard(null);
     setCardToDelete(null);
+    setIsInfoPopupOpen({isOpen: false, isSuccess: false});
   };
 
   // Обработчики открытия попапов
@@ -133,6 +170,12 @@ function App() {
     setSelectedCard(link);
   };
 
+
+  const handleClickBurger = () => {
+    setIsOpenMenu(!isOpenMenu);
+  };
+
+  // всплывающее уведомление
   const showNotification = (message, isSuccess, isActive) => {
     setNotification({ message, isSuccess, isActive });
     setTimeout(
@@ -275,13 +318,29 @@ function App() {
     [cards]
   );
 
-
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header paths={paths} userInfo={userInfo} onSignOut={handleSignOut}/>
+        <Header
+          paths={paths}
+          headerInfo={headerInfo}
+          onSignOut={handleSignOut}
+          onBurgerClick={handleClickBurger}
+          isOpenMenu={isOpenMenu}
+        />
+        <InfoTooltip
+          popupState={isInfoPopupOpen}
+          onClose={closeAllPopups}
+        />
         <Routes>
-          <Route path="*" element={loggedIn ? <Navigate to={paths.main} replace /> : <Navigate to={paths.login} replace/>} />
+          <Route
+            path="*"
+            element={
+              loggedIn 
+              ? (<Navigate to={paths.main} replace />) 
+              : (<Navigate to={paths.login} replace />)
+            }
+          />
           <Route
             path={paths.login}
             element={<Login onSubmit={handleLogin} />}
